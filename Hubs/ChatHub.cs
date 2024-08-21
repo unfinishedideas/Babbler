@@ -11,10 +11,10 @@ namespace Babbler.Hubs
             await Clients.All.SendAsync("ReceieveMessage", "admin", $"{conn.Username} has joined!");
         }
 
-        public async Task JoinChatRoom(UserConnection conn)
+        public async Task JoinSpecificChatRoom(UserConnection conn)
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, conn.ChatRoom);
-            await Clients.Group(conn.ChatRoom).SendAsync("ReceiveMessage", "admin", $"{conn.Username} has joined {conn.ChatRoom}!");
+            await Clients.Group(conn.ChatRoom).SendAsync("JoinSpecificChatRoom", "admin", $"{conn.Username} has joined {conn.ChatRoom}!");
         }
         
     }
