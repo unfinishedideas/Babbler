@@ -4,13 +4,14 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import React from "react";
 import { useState } from "react";
 import WaitingRoom from "./components/waitingRoom";
+import ChatRoom from "./components/chatRoom";
 import { HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
 
 function App() {
   const [conn, setConnection] = useState();
+  const [messages, setMessages] = useState([]);
 
   const joinChatRoom = async (username, chatRoom) => {
-    console.log(`Username: ${username}, ChatRoom: ${chatRoom}`)
     try {
       // initiate a connection (URL is where server is hosted)
       const conn = new HubConnectionBuilder()
@@ -18,9 +19,13 @@ function App() {
         .configureLogging(LogLevel.Information)
         .build();
 
-      // setup handler
+      // setup handlers
       conn.on("JoinSpecificChatRoom", (username, msg) => {
-        console.log(`user: ${username}, msg: ${msg}`);
+        setMessages(messages => [...messages, {username, msg}]);
+      });
+      
+      conn.on("ReceiveSpecificMessage", (username, msg) => {
+        setMessages(messages => [...messages, {username, msg}]);
       });
 
       await conn.start();
@@ -33,6 +38,15 @@ function App() {
     }
   };
 
+  const sendMessage = async (msg) => {
+      try {
+        await conn.invoke("SendMessage", msg);
+
+      } catch (e) {
+        console.error(`ERR sendMessage: ${e}`)
+      }
+  }
+
   return (
     <div>
       <main>
@@ -40,7 +54,11 @@ function App() {
           <Row className="px-5 my-5">
             <Col sm="12">
               <h1 className="font-weight-light">Babbler Chat App</h1>
-              <WaitingRoom joinChatroom={joinChatRoom}></WaitingRoom>
+              {!conn ? (
+                <WaitingRoom joinChatroom={joinChatRoom}></WaitingRoom>
+              ) : (
+                <ChatRoom messages={messages} sendMessage={sendMessage}></ChatRoom>
+              )}
             </Col>
           </Row>
         </Container>

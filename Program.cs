@@ -1,3 +1,4 @@
+using Babbler.DataStore;
 using Babbler.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,7 +10,7 @@ builder.Services.AddControllers();
 
 builder.Services.AddCors(opt =>
 {
-    opt.AddPolicy("reactApp", builder =>
+    opt.AddPolicy("corsPolicy", builder =>
     {
         builder.WithOrigins("http://localhost:3000")
             .AllowAnyHeader()
@@ -17,6 +18,8 @@ builder.Services.AddCors(opt =>
             .AllowCredentials();
     });
 });
+
+builder.Services.AddSingleton<SharedDb>();
 
 var app = builder.Build();
 
@@ -29,6 +32,6 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.MapHub<ChatHub>("/chat");
-app.UseCors("reactApp");
+app.UseCors("corsPolicy");
 
 app.Run();
