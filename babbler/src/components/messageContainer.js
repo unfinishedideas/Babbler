@@ -1,17 +1,20 @@
 import React from "react";
+import {v4 as uuidv4 } from 'uuid';
 
 const MessageContainer = ({ messages }) => {
   return (
     <div>
-      {messages.map((msg, index) => (
-        <table striped bordererd>
-          <tr key={index}>
-            <td>
-              {msg.username}: {msg.msg}
-            </td>
-          </tr>
-        </table>
-      ))}
+      <table className="table table-striped bordered">
+        {messages.map((msg, index) => (
+          <tbody key={index}>
+            <tr>
+              <td>
+                {msg.username}: {msg.msg}
+              </td>
+            </tr>
+          </tbody>
+        ))}
+      </table>
     </div>
   );
 };
